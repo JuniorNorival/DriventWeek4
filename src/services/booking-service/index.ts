@@ -13,13 +13,12 @@ async function getBookingByUser(userId: number) {
 }
 
 async function createBooking(userId: number, roomId: number) {
+  await verifyRoom(roomId);
   await verifyTicket(userId);
 
   const userBooking = await bookingRepository.findBookingByUserId(userId);
 
   if (userBooking) throw forbiddenError();
-
-  await verifyRoom(roomId);
 
   const newBookingData = { userId, roomId };
 
@@ -48,11 +47,13 @@ async function updateBooking(userId: number, bookingId: number, roomId: number) 
 async function verifyTicket(userId: number) {
   const enrollment = await enrollmentRepository.findWithAddressByUserId(userId);
 
-  if (!enrollment) throw notFoundError();
+  if (!enrollment) {
+    throw forbiddenError();
+  }
 
   const ticket = await ticketRepository.findTicketByEnrollmentId(enrollment.id);
 
-  if (!ticket) throw notFoundError();
+  if (!ticket) throw forbiddenError();
 
   if (ticket.TicketType.isRemote || !ticket.TicketType.includesHotel) {
     throw forbiddenError();

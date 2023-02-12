@@ -4,7 +4,7 @@ import { Response } from 'express';
 import httpStatus from 'http-status';
 
 export async function getBookingByUser(req: AuthenticatedRequest, res: Response) {
-  const { userId } = req.body;
+  const { userId } = req;
 
   try {
     const booking = await bookingService.getBookingByUser(userId);
@@ -15,15 +15,16 @@ export async function getBookingByUser(req: AuthenticatedRequest, res: Response)
 }
 
 export async function postBooking(req: AuthenticatedRequest, res: Response) {
-  const { userId } = req.body;
+  const { userId } = req;
   const roomId = Number(req.body.roomId);
 
+  if (!roomId) return res.sendStatus(httpStatus.NOT_FOUND);
   try {
-    const newBooking = bookingService.createBooking(userId, roomId);
+    const newBooking = await bookingService.createBooking(userId, roomId);
 
     return res.status(httpStatus.OK).send(newBooking);
   } catch (error) {
-    if (error.name === 'ForbidenError') {
+    if (error.name === 'ForbiddenError') {
       return res.status(httpStatus.FORBIDDEN).send(error.message);
     }
 

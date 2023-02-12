@@ -1,8 +1,9 @@
 import { prisma } from '@/config';
 import { Booking } from '@prisma/client';
+
 async function findBookingByUserId(userId: number) {
   return prisma.booking.findFirst({
-    where: { userId },
+    where: { userId: userId },
     include: {
       Room: true,
     },
@@ -20,7 +21,7 @@ export type NewBooking = Pick<Booking, 'userId' | 'roomId'>;
 
 async function countBookingRoomId(roomId: number) {
   return prisma.booking.count({
-    where: { id: roomId },
+    where: { roomId: roomId },
   });
 }
 
