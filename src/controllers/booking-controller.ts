@@ -4,7 +4,7 @@ import { Response } from 'express';
 import httpStatus from 'http-status';
 
 export async function getBookingByUser(req: AuthenticatedRequest, res: Response) {
-  const { userId } = req;
+  const { userId } = req.body;
 
   try {
     const booking = await bookingService.getBookingByUser(userId);
